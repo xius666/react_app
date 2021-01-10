@@ -8,6 +8,7 @@ function Row({ title, fetchUrl, LargeRow }) {
   const base = "http://image.tmdb.org/t/p/original/";
   const [movies, setMovies] = useState([]);
   const [trailer_url, setTrailer_url] = useState("");
+  const [msg, setMsg] = useState("");
   useEffect(() => {
     async function fetchData() {
       const request = await axios.get(fetchUrl);
@@ -28,13 +29,15 @@ function Row({ title, fetchUrl, LargeRow }) {
   const handleClick = (movie) => {
     if (trailer_url) {
       setTrailer_url("");
+      setMsg("");
     } else {
+      setMsg("");
       movieTrailer(movie?.name || movie?.title || "")
         .then((url) => {
           const urlParams = new URLSearchParams(new URL(url).search);
           setTrailer_url(urlParams.get("v"));
         })
-        .catch((error) => console.log(error));
+        .catch((error) => setMsg(`No trailer found for ${movie.name}`));
     }
   };
   console.log(movies);
@@ -55,6 +58,7 @@ function Row({ title, fetchUrl, LargeRow }) {
         ))}
       </div>
       {trailer_url && <YouTube videoId={trailer_url} opts={opts} />}
+      {msg && <h3 className="error"> {msg} </h3>}
     </div>
   );
 }
